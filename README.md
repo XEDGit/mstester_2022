@@ -1,4 +1,4 @@
-#New Minishell Tester
+# New Minishell Tester
 Welcome to the minishell tester, this script will make you test your minishell in a very fast and comprehensive manner with the standard mode, or in a more dynamic way, thanks to the interactive mode (-i).
 
 ## Run
