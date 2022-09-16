@@ -1,0 +1,5 @@
+echo sos | echo lol | cat -e
+false
+false < l | exit 66 | exit 66 | exit 66 | exit 66 | exit 66 | exit 66 | exit 66 | exit 66 | exit 66 | exit 66 | exit 66 | exit 66 | exit 66 | exit 66
+ls
+LOL=lol | $LOL
