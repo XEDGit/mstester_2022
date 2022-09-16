@@ -46,12 +46,12 @@ def catch_args():
 	single = -1
 	noout = True
 	interactive = False
-	file_path = "tester/tests"
+	file_path = "new_minishell_tester/tests"
 	exe_path = "./minishell"
 	while i != argc:
 		arg = str(sys.argv[i])
 		if arg == "-h":
-			print("Usage: python3 tester.py [-io] [-exe executable_path] [tests_file] [file_line]\n -i:\t\tInteractive mode\n -o:\t\tPrint output of tests\n -exe path:\tPath to your minishell executable\n tests_file:\tPath to the text file containing the tests, one per line\n file_line:\tTests only the specified line of the file specified byt file path\n\nArguments don't have a specific order")
+			print("Usage: python3 tester.py [-io] [-exe executable_path] [tests_file] [file_line]\n -i:\t\tInteractive mode\n -o:\t\tPrint output of tests\n -exe path:\tPath to your minishell executable\n tests_file:\tPath to the text file containing the tests, one per line (default: \"./new_minishell_tester/tests\")\n file_line:\tTests only the specified line of the file specified byt file path\n\nArguments don't have a specific order")
 			exit(0)
 		elif arg == "-o":
 			noout = False
