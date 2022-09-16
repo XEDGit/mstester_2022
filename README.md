@@ -8,6 +8,7 @@ To run this script you have to use the Python3 interpreter, launch this commands
     python3 new_minishell_tester/tester.py
 
 ## Flags (optional)
+    -h:            Display help text
     -i:            Interactive mode
     -o:            Print output of tests
     -exe 'path':   Path to your minishell executable
