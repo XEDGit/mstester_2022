@@ -17,3 +17,6 @@ To run this script you have to use the Python3 interpreter, launch this commands
 
 ## Troubleshooting
 If the script reports any error, make sure to use the flag '-exe path' or write as a normal argument the path to the tests file
+
+## Tests crowdsourcing
+The tests file is a crowdsourced collection of command to challenge your minishell, if you have some ideas about what to add feel free to create a pull request
