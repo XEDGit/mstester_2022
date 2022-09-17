@@ -62,34 +62,35 @@ def catch_args():
 		if arg == "-h":
 			print(help_msg)
 			exit(0)
-		elif arg == "-o":
-			noout = False
-		elif arg == "-i":
-			interactive = True
-		elif arg == "-exe":
-			i += 1
-			if i >= argc:
-				error("Error: -exe flag requires one positional argument(path)")
-			exe_path = str_to_path(sys.argv[i])
+		elif arg[0] == '-':
+			if 'o' in arg:
+				noout = False
+			if 'i' in arg:
+				interactive = True
+			if "exe" in arg:
+				i += 1
+				if i >= argc:
+					error("Error: -exe flag requires one positional argument(path)")
+				exe_path = str_to_path(sys.argv[i])
 		elif arg.isdigit():
 			single = int(arg) - 1
 		else:
 			file_path = str_to_path(arg)
 		i += 1
-	if not exists(file_path) or os.path.isdir(file_path) or os.access(file_path, os.X_OK):
+	if not interactive and not exists(file_path) or os.path.isdir(file_path) or os.access(file_path, os.X_OK):
 		error("Error: '" + file_path + "' isn't a valid file")
 	if not exists(exe_path) or os.path.isdir(exe_path) or not os.access(exe_path, os.X_OK):
 		error("Error: '" + exe_path + "' isn't a valid file")
-	print(file_path, exe_path)
 	return noout, interactive, single, file_path, exe_path
 
 def main():
 	passed = 0
 	tot = 0
 	noout, interactive, single, file_path, exe_path = catch_args()
-	fd = open(file_path, "r")
-	tests = fd.readlines()
-	fd.close()
+	if not interactive:
+		fd = open(file_path, "r")
+		tests = fd.readlines()
+		fd.close()
 	if not interactive and single >= len(tests):
 		error("Error: specified line " + str(single + 1) + " is not present in " + file_path)
 	print(col("Welcome to the tester for the new 42 minishell!\n\t\tby XEDGit\n", "36;1"))
