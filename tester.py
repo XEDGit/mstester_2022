@@ -6,18 +6,37 @@ import sys
 import os
 
 def send_cmd(prog, test):
-	p = subprocess.Popen(prog, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=DEVNULL)
+	p = subprocess.Popen(prog, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	p.stdin.write(test.encode())
 	p.stdin.close()
 	p_res = p.stdout.read()
 	p.stdout.close()
+	p_err = p.stderr.read()
+	p.stderr.close()
 	p.terminate()
 	p.wait()
-	return p.returncode, p_res.decode().rstrip("\n")
+	return p.returncode, p_res.decode().rstrip("\n"), p_err.decode().rstrip("\n")
 
-def test_cmd(exe_path, test, noout, i):
-	mini_code, mini_res = send_cmd(exe_path, test)
-	bash_code, bash_res = send_cmd("bash", test)
+def make_output(i, test, mini_res, mini_err, mini_code, bash_res, bash_err, bash_code, diff, noout, err):
+	out = f"{col(f'Line {i + 1}: ', '1;31')}{test} {diff}\n"
+	if not noout:
+		out += f"{col('minishell:', '31')}\n'{mini_res}'\n"
+		if err:
+			out += f"{col('minishell stderr:', '31')}\n{mini_err}\n"
+		out += f"{col('exit code: ', '31')}{mini_code}\n"
+		out += f"{col('bash: ', '31')}\n'{bash_res}'\n"
+		if err:
+			out += f"{col('bash stderr:', '31')}\n{bash_err}\n"
+		out += f"{col('exit code: ', '31')}{bash_code}\n"
+	if noout and err:
+		out += f"\n{col('minishell stderr:', '31')}\n{mini_err}\n"
+		out += f"{col('bash stderr:', '31')}\n{bash_err}\n"
+	out += "_________________________________________________________________"
+	return out
+
+def test_cmd(exe_path, test, noout, err, i):
+	mini_code, mini_res, mini_err = send_cmd(exe_path, test)
+	bash_code, bash_res, bash_err = send_cmd("bash", test)
 	diff = col("Fail", "31")
 	success = 0
 	if mini_res == bash_res:
@@ -26,10 +45,7 @@ def test_cmd(exe_path, test, noout, i):
 	if mini_code != bash_code:
 		diff += " - " + col("Wrong exit code", "33")
 	test = test.rstrip("\n")
-	if noout:
-		out = f"{col(f'Line {i + 1}: ', '1;31')}{test} {diff}"
-	else:
-		out = f"{col(f'Line {i + 1}: ', '1;31')}{test}\n{col('minishell: ', '31')}\n'{mini_res}'\n{col('exit code: ', '31')}{mini_code}\n{col('bash: ', '31')}\n'{bash_res}'\n{col('exit code: ', '31')}{bash_code}\n{diff}"
+	out = make_output(i, test, mini_res, mini_err, mini_code, bash_res, bash_err, bash_code, diff, noout, err)
 	print(out)
 	return success
 
@@ -50,6 +66,7 @@ def catch_args():
 	i = 1
 	single = -1
 	noout = True
+	err = False
 	interactive = False
 	file_path = "new_minishell_tester/tests"
 	exe_path = "./minishell"
@@ -67,6 +84,8 @@ def catch_args():
 				noout = False
 			if 'i' in arg:
 				interactive = True
+			if 'err' in arg:
+				err = True
 			if "exe" in arg:
 				i += 1
 				if i >= argc:
@@ -81,12 +100,12 @@ def catch_args():
 		error("Error: '" + file_path + "' isn't a valid file")
 	if not exists(exe_path) or os.path.isdir(exe_path) or not os.access(exe_path, os.X_OK):
 		error("Error: '" + exe_path + "' isn't a valid file")
-	return noout, interactive, single, file_path, exe_path
+	return noout, interactive, single, file_path, exe_path, err
 
 def main():
 	passed = 0
 	tot = 0
-	noout, interactive, single, file_path, exe_path = catch_args()
+	noout, interactive, single, file_path, exe_path, err = catch_args()
 	if not interactive:
 		fd = open(file_path, "r")
 		tests = fd.readlines()
@@ -101,14 +120,14 @@ def main():
 				test = input(">")
 			except:
 				break
-			passed += test_cmd(exe_path, test, noout, tot)
+			passed += test_cmd(exe_path, test, False, err, tot)
 			tot += 1
 	elif single != -1:
-		passed = test_cmd(exe_path, tests[single], noout, single)
+		passed = test_cmd(exe_path, tests[single], noout, err, single)
 		tot += 1
 	else:
 		for i, test in enumerate(tests):
-			passed += test_cmd(exe_path, test, noout, i)
+			passed += test_cmd(exe_path, test, noout, err, i)
 			tot += 1
 	print("\n" + col(str(passed) + "/" + str(tot) + " successful tests!", "35;1"))
 
