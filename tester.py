@@ -93,6 +93,7 @@ def catch_args():
 				exe_path = str_to_path(sys.argv[i])
 		elif arg.isdigit():
 			single = int(arg) - 1
+			noout = False
 		else:
 			file_path = str_to_path(arg)
 		i += 1

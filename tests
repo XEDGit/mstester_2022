@@ -28,7 +28,6 @@ echo $TEST$TEST$TEST
 echo $TEST$TEST=lol$TEST""lol
 echo    $TEST lol $TEST
 echo test "" test "" test
-echo "\$TEST"
 echo "$=TEST"
 echo "$"
 echo "$?TEST"
