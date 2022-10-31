@@ -6,6 +6,7 @@ import sys
 import os
 
 def send_cmd(prog, test):
+	test = test.replace(";", "\n")
 	p = subprocess.Popen(prog, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	p.stdin.write(test.encode())
 	p.stdin.close()
