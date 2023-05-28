@@ -1,6 +1,5 @@
-from asyncio.subprocess import DEVNULL
 from genericpath import exists
-import readline
+from locale import getpreferredencoding
 import subprocess
 import sys
 import os
@@ -8,7 +7,7 @@ import os
 def send_cmd(prog, test):
 	test = test.replace(";", "\n")
 	p = subprocess.Popen(prog, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	p.stdin.write(test.encode())
+	p.stdin.write(test.encode(getpreferredencoding(), 'replace'))
 	p.stdin.close()
 	p_res = p.stdout.read()
 	p.stdout.close()
@@ -16,7 +15,7 @@ def send_cmd(prog, test):
 	p.stderr.close()
 	p.terminate()
 	p.wait()
-	return p.returncode, p_res.decode().rstrip("\n"), p_err.decode().rstrip("\n")
+	return p.returncode, p_res.decode(getpreferredencoding(), 'replace').rstrip("\n"), p_err.decode(getpreferredencoding(), 'replace').rstrip("\n")
 
 def make_output(i, test, mini_res, mini_err, mini_code, bash_res, bash_err, bash_code, diff, noout, err):
 	out = f"{col(f'Line {i + 1}: ', '1;31')}{test} {diff}\n"
