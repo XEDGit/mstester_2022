@@ -1,5 +1,6 @@
 from genericpath import exists
 from locale import getpreferredencoding
+from collections import Counter
 import subprocess
 import sys
 import os
@@ -115,6 +116,7 @@ def main():
 	passed = 0
 	tot = 0
 	out, interactive, single, file_path, exe_path, err = catch_args()
+	pre = Counter(os.listdir('.'))
 	if not interactive:
 		fd = open(file_path, "r")
 		tests = fd.readlines()
@@ -139,6 +141,14 @@ def main():
 			passed += test_cmd(exe_path, test, out, err, i)
 			tot += 1
 	print("\n" + col(str(passed) + "/" + str(tot) + " successful tests!", "35;1"))
+	post = Counter(os.listdir('.'))
+	newfiles = list(post - pre)
+	if not newfiles:
+		exit(0)
+	print("Cleaning up generated files:")
+	for f in newfiles:
+		os.remove(f)
+		print(f"\t'./{f}' removed")
 
 if __name__ == "__main__":
 	main()
