@@ -69,16 +69,16 @@ def catch_args():
 	err = False
 	interactive = False
 	file_path = "mstester_2022/tests"
-	if not exists(file_path):
+	if not exists(file_path) or os.path.isdir(file_path):
 		file_path = "tests"
-	if not exists(file_path):
-		print("warning: the file containing tests has not been found automatically, specify it through argument")
+	if not exists(file_path) or os.path.isdir(file_path):
+		print("warning: the file containing tests has not been found automatically")
 		file_path = "Undefined"
 	exe_path = "./minishell"
-	if not exists(exe_path):
+	if not exists(exe_path) or os.path.isdir(exe_path):
 		exe_path = "../minishell"
-	if not exists(exe_path):
-		print("warning: the minishell executable has not been found automatically, specify it through '-exe path' flag")
+	if not exists(exe_path) or os.path.isdir(exe_path):
+		print("warning: the minishell executable has not been found automatically")
 		exe_path = "Undefined"
 	help_msg = "Usage: python3 tester.py [-err -o -exe executable_path] tests_file [file_line] | -i [-o -err]\n"
 	flags_msg =  "Flags:\n -i:\t\tInteractive mode\n -o:\t\tPrint stdout of both minishell and bash\n -err:\t\tPrint stderr of both minishell and bash\n -exe path:\tPath to your minishell executable\n tests_file:\tPath to the text file containing the tests, one per line (default: \"./mstester_2022/tests\")\n file_line:\tTests only the specified line of the file specified by file path\n\nArguments don't have a specific order"
