@@ -17,24 +17,24 @@ def send_cmd(prog, test):
 	p.wait()
 	return p.returncode, p_res.decode(getpreferredencoding(), 'replace').rstrip("\n"), p_err.decode(getpreferredencoding(), 'replace').rstrip("\n")
 
-def make_output(i, test, mini_res, mini_err, mini_code, bash_res, bash_err, bash_code, diff, noout, err):
-	out = f"{col(f'Line {i + 1}: ', '1;31')}{test} {diff}\n"
-	if not noout:
-		out += f"{col('minishell:', '31')}\n'{mini_res}'\n"
+def make_output(i, test, mini_res, mini_err, mini_code, bash_res, bash_err, bash_code, diff, out, err):
+	output = f"{col(f'Line {i + 1}: ', '1;31')}{test} {diff}\n"
+	if out:
+		output += f"{col('minishell:', '31')}\n'{mini_res}'\n"
 		if err:
-			out += f"{col('minishell stderr:', '31')}\n{mini_err}\n"
-		out += f"{col('exit code: ', '31')}{mini_code}\n"
-		out += f"{col('bash: ', '31')}\n'{bash_res}'\n"
+			output += f"{col('minishell stderr:', '31')}\n{mini_err}\n"
+		output += f"{col('exit code: ', '31')}{mini_code}\n"
+		output += f"{col('bash: ', '31')}\n'{bash_res}'\n"
 		if err:
-			out += f"{col('bash stderr:', '31')}\n{bash_err}\n"
-		out += f"{col('exit code: ', '31')}{bash_code}\n"
-	if noout and err:
-		out += f"\n{col('minishell stderr:', '31')}\n{mini_err}\n"
-		out += f"{col('bash stderr:', '31')}\n{bash_err}\n"
-	out += "_________________________________________________________________"
-	return out
+			output += f"{col('bash stderr:', '31')}\n{bash_err}\n"
+		output += f"{col('exit code: ', '31')}{bash_code}\n"
+	if out and err:
+		output += f"\n{col('minishell stderr:', '31')}\n{mini_err}\n"
+		output += f"{col('bash stderr:', '31')}\n{bash_err}\n"
+	output += "_________________________________________________________________"
+	return output
 
-def test_cmd(exe_path, test, noout, err, i):
+def test_cmd(exe_path, test, out, err, i):
 	mini_code, mini_res, mini_err = send_cmd(exe_path, test)
 	bash_code, bash_res, bash_err = send_cmd("bash", test)
 	diff = col("Fail", "31")
@@ -45,7 +45,7 @@ def test_cmd(exe_path, test, noout, err, i):
 	if mini_code != bash_code:
 		diff += " - " + col("Wrong exit code", "33")
 	test = test.rstrip("\n")
-	out = make_output(i, test, mini_res, mini_err, mini_code, bash_res, bash_err, bash_code, diff, noout, err)
+	out = make_output(i, test, mini_res, mini_err, mini_code, bash_res, bash_err, bash_code, diff, out, err)
 	print(out)
 	return success
 
@@ -65,23 +65,31 @@ def catch_args():
 	argc = len(sys.argv)
 	i = 1
 	single = -1
-	noout = True
+	out = False
 	err = False
 	interactive = False
-	file_path = "new_minishell_tester/tests"
+	file_path = "mstester_2022/tests"
+	if not exists(file_path):
+		file_path = "tests"
+	if not exists(file_path):
+		print("warning: the file containing tests has not been found automatically, specify it through argument")
+		file_path = "Undefined"
 	exe_path = "./minishell"
-	help_msg = "Usage: python3 tester.py [-io] [-exe executable_path] [tests_file] [file_line]\n -i:\t\tInteractive mode\n -o:\t\tPrint output of tests\n -exe path:\tPath to your minishell executable\n tests_file:\tPath to the text file containing the tests, one per line (default: \"./new_minishell_tester/tests\")\n file_line:\tTests only the specified line of the file specified by file path\n\nArguments don't have a specific order"
-	if argc < 2:
-		print(help_msg)
-		exit(0)
+	if not exists(exe_path):
+		exe_path = "../minishell"
+	if not exists(exe_path):
+		print("warning: the minishell executable has not been found automatically, specify it through '-exe path' flag")
+		exe_path = "Undefined"
+	help_msg = "Usage: python3 tester.py [-err -o -exe executable_path] tests_file [file_line] | -i [-o -err]\n"
+	flags_msg =  "Flags:\n -i:\t\tInteractive mode\n -o:\t\tPrint stdout of both minishell and bash\n -err:\t\tPrint stderr of both minishell and bash\n -exe path:\tPath to your minishell executable\n tests_file:\tPath to the text file containing the tests, one per line (default: \"./mstester_2022/tests\")\n file_line:\tTests only the specified line of the file specified by file path\n\nArguments don't have a specific order"
 	while i != argc:
 		arg = str(sys.argv[i])
 		if arg == "-h":
-			print(help_msg)
+			print(f"{help_msg}\n{flags_msg}")
 			exit(0)
 		elif arg[0] == '-':
 			if 'o' in arg:
-				noout = False
+				out = True
 			if 'i' in arg:
 				interactive = True
 			if 'err' in arg:
@@ -93,7 +101,7 @@ def catch_args():
 				exe_path = str_to_path(sys.argv[i])
 		elif arg.isdigit():
 			single = int(arg) - 1
-			noout = False
+			out = True
 		else:
 			file_path = str_to_path(arg)
 		i += 1
@@ -101,12 +109,12 @@ def catch_args():
 		error("Error: '" + file_path + "' isn't a valid file")
 	if not exists(exe_path) or os.path.isdir(exe_path) or not os.access(exe_path, os.X_OK):
 		error("Error: '" + exe_path + "' isn't a valid file")
-	return noout, interactive, single, file_path, exe_path, err
+	return out, interactive, single, file_path, exe_path, err
 
 def main():
 	passed = 0
 	tot = 0
-	noout, interactive, single, file_path, exe_path, err = catch_args()
+	out, interactive, single, file_path, exe_path, err = catch_args()
 	if not interactive:
 		fd = open(file_path, "r")
 		tests = fd.readlines()
@@ -124,11 +132,11 @@ def main():
 			passed += test_cmd(exe_path, test, False, err, tot)
 			tot += 1
 	elif single != -1:
-		passed = test_cmd(exe_path, tests[single], noout, err, single)
+		passed = test_cmd(exe_path, tests[single], out, err, single)
 		tot += 1
 	else:
 		for i, test in enumerate(tests):
-			passed += test_cmd(exe_path, test, noout, err, i)
+			passed += test_cmd(exe_path, test, out, err, i)
 			tot += 1
 	print("\n" + col(str(passed) + "/" + str(tot) + " successful tests!", "35;1"))
 
