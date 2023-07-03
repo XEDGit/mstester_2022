@@ -17,6 +17,8 @@ To run this script you have to use the Python3 interpreter
     -exe 'path':   Path to your minishell executable
 
 ## Troubleshooting
+Make sure you have set the global variable `rl_outstream = stderr;` to set the output of readline to the stderr as bash does, you can find more informations [here](http://users.softlab.ntua.gr/facilities/documentation/unix/gnu/readline/readline_28.html)
+
 If the script reports any error, make sure you're using the `-exe path` flag and you're specifying the `tests_file`
 
 ## Tests crowdsourcing
