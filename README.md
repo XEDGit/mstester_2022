@@ -26,5 +26,7 @@ Make sure you have set the global variable `rl_outstream = stderr;` to set the o
 
 If the script reports any error, make sure you're using the `-x path` flag and you're specifying the `tests_file`
 
-## Tests crowdsourcing
+## Tests file
+### Inside the tests file ';' represents '\n', it's used to execute multiple commands in the same test
+
 The tests file is a crowdsourced collection of command to challenge your minishell, if you have some ideas about what to add feel free to create a pull request
