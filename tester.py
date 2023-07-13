@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from genericpath import exists
 from locale import getpreferredencoding
 from collections import Counter
@@ -81,8 +82,8 @@ def catch_args():
 	if not exists(exe_path) or os.path.isdir(exe_path):
 		print("warning: the minishell executable has not been found automatically")
 		exe_path = "Undefined"
-	help_msg = "Usage: python3 tester.py [-err -o -exe executable_path] tests_file [file_line] | -i [-o -err]\n"
-	flags_msg =  "Flags:\n -i:\t\tInteractive mode\n -o:\t\tPrint stdout of both minishell and bash\n -err:\t\tPrint stderr of both minishell and bash\n -exe path:\tPath to your minishell executable\n tests_file:\tPath to the text file containing the tests, one per line (default: \"./mstester_2022/tests\")\n file_line:\tTests only the specified line of the file specified by file path\n\nArguments don't have a specific order"
+	help_msg = "Usage: python3 tester.py [-err -o -exe executable_path] tests_file [file_line] | -i [-o -e]\n"
+	flags_msg =  "Flags:\n -i:\t\tInteractive mode\n -o:\t\tPrint stdout of both minishell and bash\n -e:\t\tPrint stderr of both minishell and bash\n -x path:\tPath to your minishell executable\n tests_file:\tPath to the text file containing the tests, one per line (default: \"./mstester_2022/tests\")\n file_line:\tTests only the specified line of the file specified by file path\n\nArguments don't have a specific order"
 	while i != argc:
 		arg = str(sys.argv[i])
 		if arg == "-h":
@@ -93,12 +94,12 @@ def catch_args():
 				out = True
 			if 'i' in arg:
 				interactive = True
-			if 'err' in arg:
+			if 'e' in arg:
 				err = True
-			if "exe" in arg:
+			if "x" in arg:
 				i += 1
 				if i >= argc:
-					error("Error: -exe flag requires one positional argument(path)")
+					error("Error: flag requires one positional argument -x <path to minishell executable>")
 				exe_path = str_to_path(sys.argv[i])
 		elif arg.isdigit():
 			single = int(arg) - 1
