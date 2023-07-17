@@ -9,6 +9,8 @@ import os
 def send_cmd(prog, test):
 	test = test.replace(";", "\n")
 	p = subprocess.Popen(prog, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	if not p:
+		return -999, "", ""
 	p.stdin.write(test.encode(getpreferredencoding(), 'replace'))
 	p.stdin.close()
 	p_res = p.stdout.read()
@@ -39,6 +41,8 @@ def make_output(i, test, mini_res, mini_err, mini_code, bash_res, bash_err, bash
 def test_cmd(exe_path, test, out, err, i):
 	mini_code, mini_res, mini_err = send_cmd(exe_path, test)
 	bash_code, bash_res, bash_err = send_cmd("bash", test)
+	if mini_code == -999 or bash_code == -999:
+		print("Error launching process")
 	diff = col("Fail", "31")
 	success = 0
 	if mini_res == bash_res:
@@ -108,7 +112,7 @@ def catch_args():
 			file_path = str_to_path(arg)
 		i += 1
 	if not interactive and not exists(file_path) or os.path.isdir(file_path) or os.access(file_path, os.X_OK):
-		error("Error: '" + file_path + "' isn't a valid file")
+		error("Error: '" + file_path + "' isn't a valid test file")
 	if not exists(exe_path) or os.path.isdir(exe_path) or not os.access(exe_path, os.X_OK):
 		error("Error: '" + exe_path + "' isn't a valid file")
 	return out, interactive, single, file_path, exe_path, err
@@ -122,8 +126,8 @@ def main():
 		fd = open(file_path, "r")
 		tests = fd.readlines()
 		fd.close()
-	if not interactive and single >= len(tests):
-		error("Error: specified line " + str(single + 1) + " is not present in " + file_path)
+		if single >= len(tests):
+			error("Error: specified line " + str(single + 1) + " is not present in " + file_path)
 	print(col("Welcome to the tester for the new 42 minishell!\n\t\tby XEDGit\n", "36;1"))
 	if interactive:
 		print(col("Enter a command line to test (exit with Ctrl+C):", "31"))
@@ -132,7 +136,7 @@ def main():
 				test = input(">")
 			except:
 				break
-			passed += test_cmd(exe_path, test, False, err, tot)
+			passed += test_cmd(exe_path, test, out, err, tot)
 			tot += 1
 	elif single != -1:
 		passed = test_cmd(exe_path, tests[single], out, err, single)
