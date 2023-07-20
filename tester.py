@@ -2,6 +2,7 @@
 from genericpath import exists
 from locale import getpreferredencoding
 from collections import Counter
+import readline
 import subprocess
 import sys
 import os
