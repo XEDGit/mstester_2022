@@ -33,9 +33,6 @@ def make_output(i, test, mini_res, mini_err, mini_code, bash_res, bash_err, bash
 		if err:
 			output += f"{col('bash stderr:', '31')}\n{bash_err}\n"
 		output += f"{col('exit code: ', '31')}{bash_code}\n"
-	if out and err:
-		output += f"\n{col('minishell stderr:', '31')}\n{mini_err}\n"
-		output += f"{col('bash stderr:', '31')}\n{bash_err}\n"
 	output += "_________________________________________________________________"
 	return output
 
