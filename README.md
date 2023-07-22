@@ -5,20 +5,21 @@ Welcome to the minishell tester, this script will make you test your minishell i
 
 Using tests file:
 ```shell
-    ./tester.py [-oex] [tests_file] [file_line]
-```
-Interactive mode:
-```shell
-	./tester.py -i [-oex]
+./tester.py [-oexd] [tests_file] [file_line]
 ```
     tests_file:    Path to the text file containing the tests, one per line (default: "./mstester_2022/tests")
     file_line:     Tests only the specified line of the file specified byt file path [optional]
+Interactive mode:
+```shell
+./tester.py -i [-oexd]
+```
 
 ## Flags (optional)
     -h:          Display help text
     -i:          Interactive mode
-    -o:          Print stdout of both minishell and bash
-    -e:          Print stderr of both minishell and bash
+    -o:          Show stdout
+    -e:          Show stderr
+	-d:          Print `diff -u` between outputs
     -x `path`:   Path to your minishell executable
 
 ## Troubleshooting
