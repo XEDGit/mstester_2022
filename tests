@@ -56,3 +56,4 @@ ls -Z
 cd gdhahahad
 ls -la | wtf
 cat << ''"t"est""''t'es'""'t'; test"$TEST"; 'test'; testtest
+echo $(python3 -c 'print("a" * 1000)')
